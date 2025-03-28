@@ -27,7 +27,8 @@ services:
     ports:
       - "8090:8090"
     environment:
-      - ConnectionStrings__SalesApiDb=Host=db;Database=SalesApiDb;Username=postgres;Password=admin
+      - ConnectionStrings__SalesApiDb=Server=db;Database=SalesApiDb;User Id=sa;Password=FredStrongPa55
+
     networks:
       - evaluation-network
     tty: true
@@ -36,7 +37,7 @@ services:
     image: mcr.microsoft.com/mssql/server:2019-latest
     container_name: db
     environment:
-      SA_PASSWORD: "YourStrong!Passw0rd"
+      SA_PASSWORD: "FredStrongPa55"
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"

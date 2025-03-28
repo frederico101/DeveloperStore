@@ -5,7 +5,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
+          "Host": "sales-api",
           "Port": 8090
         }
       ],
@@ -14,6 +14,6 @@
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:7777"
+    "BaseUrl": "http://ocelot-gateway:7777"
   }
 }
