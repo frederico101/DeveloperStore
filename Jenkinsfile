@@ -7,8 +7,8 @@ pipeline {
         DOCKER_NETWORK = "evaluation-network"
         CANDIDATE_WORKSPACE = "C:\\data\\project"
         TESTS_PATH = "C:\\data\\tests-suite"
-        GIT_USERNAME = 'frederico101'
-        GIT_PASSWORD = credentials('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')
+        // Use SSH URL or GitHub App token instead of password
+        GIT_CREDENTIALS_ID = 'your-github-ssh-key-credential-id' // Replace with your SSH key credential ID in Jenkins
     }
 
     stages {
@@ -21,10 +21,16 @@ pipeline {
                         if (params.GIT_REPO_URL == '') {
                             error "Git repository URL is required!"
                         }
-                        bat "git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/frederico101/DeveloperStore.git ${CANDIDATE_WORKSPACE}"
-                        dir("${CANDIDATE_WORKSPACE}") {
-                            bat 'git checkout main || git checkout master'
-                        }
+                        // Use SSH URL or authenticated HTTPS with token
+                        checkout([
+                            $class: 'GitSCM',
+                            branches: [[name: '*/main']],
+                            extensions: [],
+                            userRemoteConfigs: [[
+                                credentialsId: GIT_CREDENTIALS_ID,
+                                url: params.GIT_REPO_URL
+                            ]]
+                        ])
                     }
                 }
             }
