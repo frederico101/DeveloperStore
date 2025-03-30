@@ -43,7 +43,23 @@ services:
       - "1433:1433"
     networks:
       - evaluation-network
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    user: root
+    ports:
+      - "8080:8080" # Jenkins UI
+      - "50000:50000" # Jenkins agent communication
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+    networks:
+      - evaluation-network
+
 networks:
   evaluation-network:
     external: true
+volumes:
+  jenkins_home:
   
