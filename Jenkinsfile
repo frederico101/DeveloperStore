@@ -2,14 +2,13 @@ pipeline {
     agent any
     parameters {
         string(name: 'GIT_REPO_URL', defaultValue: 'https://github.com/frederico101/DeveloperStore.git', description: 'URL do repositório Git')
-        string(name: 'BRANCH_NAME', defaultValue: 'feature/Configure-pipeline-master', description: 'Branch name to checkout')
     }
     environment {
         DOCKER_NETWORK = "evaluation-network"
         CANDIDATE_WORKSPACE = "C:\\data\\project"
         TESTS_PATH = "C:\\data\\tests-suite"
-        // Make sure this matches exactly the credential ID you created in Jenkins
-        GIT_CREDENTIALS_ID = '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' 
+        // Using SSH for authentication (recommended for local development)
+        GIT_BRANCH = "feature/Configure-pipeline-master"
     }
 
     stages {
@@ -18,36 +17,20 @@ pipeline {
                 script {
                     if (fileExists("${CANDIDATE_WORKSPACE}")) {
                         echo "Directory ${CANDIDATE_WORKSPACE} already exists"
-                        // If directory exists, still ensure we're on the right branch
                         dir("${CANDIDATE_WORKSPACE}") {
-                            checkout([
-                                $class: 'GitSCM',
-                                branches: [[name: "*/${params.BRANCH_NAME}"]],
-                                extensions: [],
-                                userRemoteConfigs: [[
-                                    credentialsId: GIT_CREDENTIALS_ID,
-                                    url: params.GIT_REPO_URL
-                                ]]
-                            ])
+                            // If directory exists, pull latest changes
+                            bat "git pull origin ${GIT_BRANCH}"
                         }
                     } else {
                         if (params.GIT_REPO_URL == '') {
                             error "Git repository URL is required!"
                         }
-                        checkout([
-                            $class: 'GitSCM',
-                            branches: [[name: "*/${params.BRANCH_NAME}"]],
-                            extensions: [[
-                                $class: 'CloneOption',
-                                timeout: 30,
-                                depth: 1,
-                                noTags: true
-                            ]],
-                            userRemoteConfigs: [[
-                                credentialsId: GIT_CREDENTIALS_ID,
-                                url: params.GIT_REPO_URL
-                            ]]
-                        ])
+                        // Using simple git clone command (no credentials needed for public repo)
+                        bat """
+                            git clone ${params.GIT_REPO_URL} ${CANDIDATE_WORKSPACE}
+                            cd ${CANDIDATE_WORKSPACE}
+                            git checkout ${GIT_BRANCH}
+                        """
                     }
                 }
             }
