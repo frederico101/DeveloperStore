@@ -8,10 +8,9 @@ pipeline {
     
     environment {
         DOCKER_NETWORK = "evaluation-network"
-        CANDIDATE_WORKSPACE = "C:\\data\\project"
-        TESTS_PATH = "C:\\data\\tests-suite"
-        // Make sure this credential is properly set up in Jenkins
-        GIT_CREDENTIALS_ID = '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' 
+        CANDIDATE_WORKSPACE = "/data/project"
+        TESTS_PATH = "/data/tests-suite"
+        GIT_CREDENTIALS_ID = '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' // Ensure this credential is properly set up in Jenkins
     }
 
     stages {
@@ -19,9 +18,9 @@ pipeline {
             steps {
                 script {
                     // Create directories if they don't exist
-                    bat """
-                    if not exist "${CANDIDATE_WORKSPACE}" mkdir "${CANDIDATE_WORKSPACE}"
-                    if not exist "${TESTS_PATH}" mkdir "${TESTS_PATH}"
+                    sh """
+                    mkdir -p "${CANDIDATE_WORKSPACE}"
+                    mkdir -p "${TESTS_PATH}"
                     """
                 }
             }
@@ -32,7 +31,7 @@ pipeline {
                 script {
                     dir("${CANDIDATE_WORKSPACE}") {
                         // Clean workspace if it exists
-                        bat 'if exist . ( rmdir /s /q . )'
+                        sh 'rm -rf *'
                         
                         // Clone using HTTPS with credentials
                         checkout([
@@ -59,8 +58,8 @@ pipeline {
             steps {
                 dir("${CANDIDATE_WORKSPACE}") {
                     script {
-                        bat """
-                        docker network create ${DOCKER_NETWORK} || echo "Network already exists"
+                        sh """
+                        docker network create ${DOCKER_NETWORK} || true
                         docker-compose up -d --build
                         """
                     }
@@ -72,9 +71,9 @@ pipeline {
             steps {
                 script {
                     // Wait for SQL Server to be ready
-                    bat """
+                    sh """
                     echo "Waiting for services to start..."
-                    timeout /t 30
+                    sleep 30
                     """
                 }
             }
@@ -83,13 +82,13 @@ pipeline {
         stage('Run Automated Tests') {
             steps {
                 script {
-                    bat """
+                    sh """
                     echo "Running tests..."
-                    docker run --rm --network=${DOCKER_NETWORK} -v "${TESTS_PATH}:C:\\tests" mcr.microsoft.com/dotnet/sdk:8.0 cmd /c "
-                    mkdir C:\\tests\\results || echo Results dir exists
-                    cd C:\\tests
-                    dotnet restore
-                    dotnet test --logger \"trx;LogFileName=results.trx\" --results-directory C:\\tests\\results
+                    docker run --rm --network=${DOCKER_NETWORK} -v "${TESTS_PATH}:/tests" mcr.microsoft.com/dotnet/sdk:8.0 sh -c "
+                    mkdir -p /tests/results &&
+                    cd /tests &&
+                    dotnet restore &&
+                    dotnet test --logger 'trx;LogFileName=results.trx' --results-directory /tests/results
                     "
                     """
                 }
@@ -99,9 +98,9 @@ pipeline {
         stage('Shut Down Environment') {
             steps {
                 dir("${CANDIDATE_WORKSPACE}") {
-                    bat """
+                    sh """
                     docker-compose down
-                    docker network rm ${DOCKER_NETWORK} || echo "Network removal failed"
+                    docker network rm ${DOCKER_NETWORK} || true
                     """
                 }
             }
@@ -111,8 +110,8 @@ pipeline {
     post {
         always {
             script {
-                archiveArtifacts artifacts: "${TESTS_PATH}\\results\\*.trx", allowEmptyArchive: true
-                junit "${TESTS_PATH}\\results\\*.trx"
+                archiveArtifacts artifacts: "${TESTS_PATH}/results/*.trx", allowEmptyArchive: true
+                junit "${TESTS_PATH}/results/*.trx"
                 cleanWs()
             }
         }
