@@ -8,7 +8,7 @@ pipeline {
         CANDIDATE_WORKSPACE = '/data/project'
         TESTS_PATH = '/data/tests-suite'
         GIT_USERNAME = 'frederico101'
-        GIT_PASSWORD = credentials('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') 
+        GIT_PASSWORD = credentials('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') 
     }
     
     stages {
