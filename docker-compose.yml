@@ -1,0 +1,49 @@
+
+
+services:
+  gateway:
+    image: ocelot-gateway
+    build:
+      context: .
+      dockerfile: src/Gateway/Dockerfile
+    container_name: ocelot-gateway
+    ports:
+      - "0.0.0.0:7777:7777"
+    environment:
+      - ASPNETCORE_URLS=http://+:7777
+    depends_on:
+      - sales-api
+    networks:
+      - evaluation-network
+
+  sales-api:
+    image: sales-api
+    build:
+      context: .
+      dockerfile: src/SalesApi/Dockerfile
+    container_name: sales-api
+    depends_on:
+      - db
+    ports:
+      - "8090:8090"
+    environment:
+      - ConnectionStrings__SalesApiDb=Server=db;Database=SalesApiDb;User Id=sa;Password=FredStrongPa55
+
+    networks:
+      - evaluation-network
+    tty: true
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: db
+    environment:
+      SA_PASSWORD: "FredStrongPa55"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    networks:
+      - evaluation-network
+networks:
+  evaluation-network:
+    external: true
+  
