@@ -10,7 +10,7 @@ pipeline {
         DOCKER_NETWORK = "evaluation-network"
         CANDIDATE_WORKSPACE = "/data/project"
         TESTS_PATH = "/data/tests-suite"
-        GIT_CREDENTIALS_ID = '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' // Ensure this credential is properly set up in Jenkins
+        GIT_CREDENTIALS_ID = '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' // Ensure this credential is properly set up in Jenkins
     }
 
     stages {
