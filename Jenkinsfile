@@ -3,21 +3,22 @@ pipeline {
     
     parameters {
         string(name: 'GIT_REPO_URL', defaultValue: 'https://github.com/frederico101/DeveloperStore.git', description: 'Git repository URL')
-        string(name: 'BRANCH_NAME', defaultValue: 'feature/Configure-pipeline-master', description: 'Branch to checkout')
+        string(name: 'BRANCH_NAME', defaultValue: 'feature/Configure-pipeline-master', description: 'Branch to build (master, dev, feature/Configure-pipeline-master, etc.)')
     }
-    
+
     environment {
         DOCKER_NETWORK = "evaluation-network"
-        CANDIDATE_WORKSPACE = "/data/project"
-        TESTS_PATH = "/data/tests-suite"
-        GIT_CREDENTIALS_ID = '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' // Ensure this credential is properly set up in Jenkins
+        CANDIDATE_WORKSPACE = "${WORKSPACE}/project"
+        TESTS_PATH = "${WORKSPACE}/tests-suite"
+        // Use one of these credential options:
+         GIT_CREDENTIALS_ID = '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' // For HTTPS auth
+        // GIT_CREDENTIALS_ID = 'github-ssh'   // For SSH auth
     }
 
     stages {
         stage('Prepare Workspace') {
             steps {
                 script {
-                    // Create directories if they don't exist
                     sh """
                     mkdir -p "${CANDIDATE_WORKSPACE}"
                     mkdir -p "${TESTS_PATH}"
@@ -29,27 +30,30 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 script {
-                    dir("${CANDIDATE_WORKSPACE}") {
-                        // Clean workspace if it exists
-                        sh 'rm -rf *'
-                        
-                        // Clone using HTTPS with credentials
-                        checkout([
-                            $class: 'GitSCM',
-                            branches: [[name: "*/${params.BRANCH_NAME}"]],
-                            extensions: [[
-                                $class: 'CloneOption',
-                                timeout: 30,
-                                depth: 1,
-                                noTags: true,
-                                honorRefspec: true
-                            ]],
-                            userRemoteConfigs: [[
-                                url: params.GIT_REPO_URL,
-                                credentialsId: GIT_CREDENTIALS_ID
-                            ]]
-                        ])
+                    // Option 1: HTTPS with credentials
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "*/${params.BRANCH_NAME}"]],
+                        extensions: [[
+                            $class: 'CloneOption',
+                            timeout: 30,
+                            depth: 1,
+                            noTags: true
+                        ]],
+                        userRemoteConfigs: [[
+                            url: params.GIT_REPO_URL,
+                            credentialsId: env.GIT_CREDENTIALS_ID ?: null
+                        ]]
+                    ])
+                    
+                    // Option 2: SSH alternative (uncomment if using SSH)
+                    /*
+                    sshagent(credentials: [env.GIT_CREDENTIALS_ID]) {
+                        sh """
+                        git clone -b ${params.BRANCH_NAME} git@github.com:frederico101/DeveloperStore.git "${CANDIDATE_WORKSPACE}"
+                        """
                     }
+                    */
                 }
             }
         }
@@ -57,23 +61,9 @@ pipeline {
         stage('Start Docker Environment') {
             steps {
                 dir("${CANDIDATE_WORKSPACE}") {
-                    script {
-                        sh """
-                        docker network create ${DOCKER_NETWORK} || true
-                        docker-compose up -d --build
-                        """
-                    }
-                }
-            }
-        }
-
-        stage('Wait for Services') {
-            steps {
-                script {
-                    // Wait for SQL Server to be ready
                     sh """
-                    echo "Waiting for services to start..."
-                    sleep 30
+                    docker network create ${DOCKER_NETWORK} || true
+                    docker-compose up -d --build
                     """
                 }
             }
@@ -83,13 +73,12 @@ pipeline {
             steps {
                 script {
                     sh """
-                    echo "Running tests..."
-                    docker run --rm --network=${DOCKER_NETWORK} -v "${TESTS_PATH}:/tests" mcr.microsoft.com/dotnet/sdk:8.0 sh -c "
-                    mkdir -p /tests/results &&
-                    cd /tests &&
-                    dotnet restore &&
-                    dotnet test --logger 'trx;LogFileName=results.trx' --results-directory /tests/results
-                    "
+                    echo "Waiting for services to initialize..."
+                    sleep 30
+                    docker run --rm --network=${DOCKER_NETWORK} \
+                    -v "${TESTS_PATH}:/tests" \
+                    mcr.microsoft.com/dotnet/sdk:8.0 \
+                    bash -c "mkdir -p /tests/results && cd /tests && dotnet restore && dotnet test --logger 'trx;LogFileName=results.trx' --results-directory /tests/results"
                     """
                 }
             }
@@ -99,7 +88,7 @@ pipeline {
             steps {
                 dir("${CANDIDATE_WORKSPACE}") {
                     sh """
-                    docker-compose down
+                    docker-compose down || true
                     docker network rm ${DOCKER_NETWORK} || true
                     """
                 }
