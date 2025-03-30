@@ -8,6 +8,7 @@ pipeline {
         CANDIDATE_WORKSPACE = '/data/project'
         TESTS_PATH = '/data/tests-suite'
     }
+    
     stages {
         stage('Clonar Repositório do Candidato') {
             steps {
