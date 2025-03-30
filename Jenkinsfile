@@ -1,11 +1,16 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'docker:latest'
+            args '--privileged --network host -v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
     stages {
         stage('Build and Test') {
             steps {
                 script {
                     sh """
-                    docker --version  # Verify Docker is available
+                    docker --version
                     docker-compose --version
                     docker network create evaluation-network || true
                     docker-compose up -d --build

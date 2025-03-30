@@ -54,9 +54,15 @@ services:
       - "50000:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock  # Allows Jenkins to run Docker commands
     environment:
       - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+  dind:
+    image: docker:dind
+    privileged: true
+    volumes:
+      - docker-storage:/var/lib/docker
+    expose:
+      - "2375"
 
 networks:
   evaluation-network:
