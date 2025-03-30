@@ -1,12 +1,14 @@
 pipeline {
     agent any
     parameters {
-        string(name: 'GIT_REPO_URL', defaultValue: '', description: 'URL do repositório Git do candidato')
+        string(name: 'GIT_REPO_URL', defaultValue: 'https://github.com/frederico101/DeveloperStore.git', description: 'URL do repositório Git do candidato')
     }
     environment {
         DOCKER_NETWORK = "evaluation-network"
         CANDIDATE_WORKSPACE = '/data/project'
         TESTS_PATH = '/data/tests-suite'
+        GIT_USERNAME = 'frederico101'
+        GIT_PASSWORD = credentials('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') 
     }
     
     stages {
