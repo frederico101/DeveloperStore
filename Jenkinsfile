@@ -1,14 +1,14 @@
 pipeline {
     agent any
     parameters {
-        string(name: 'GIT_REPO_URL', defaultValue: 'https://github.com/frederico101/DeveloperStore.git', description: 'URL do repositório Git do candidato')
+        string(name: 'GIT_REPO_URL', defaultValue: 'https://github.com/frederico101/DeveloperStore.git', description: 'URL do repositório Git')
     }
     environment {
         DOCKER_NETWORK = "evaluation-network"
         CANDIDATE_WORKSPACE = "C:\\data\\project"
         TESTS_PATH = "C:\\data\\tests-suite"
         GIT_USERNAME = 'frederico101'
-        GIT_PASSWORD = credentials('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')
+        GIT_PASSWORD = credentials('github-token')  // <-- Alterado para usar credenciais seguras do Jenkins
     }
 
     stages {
@@ -74,7 +74,7 @@ pipeline {
 
     post {
         always {
-            node {
+            script {
                 archiveArtifacts artifacts: "${TESTS_PATH}\\results\\*.trx", allowEmptyArchive: true
                 junit "${TESTS_PATH}\\results\\*.trx"
                 cleanWs()
