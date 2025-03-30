@@ -8,7 +8,7 @@ pipeline {
         CANDIDATE_WORKSPACE = "C:\\data\\project"
         TESTS_PATH = "C:\\data\\tests-suite"
         GIT_USERNAME = 'frederico101'
-        GIT_PASSWORD = credentials('github-token')  // <-- Alterado para usar credenciais seguras do Jenkins
+        GIT_PASSWORD = credentials('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')
     }
 
     stages {
