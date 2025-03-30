@@ -22,7 +22,7 @@ pipeline {
                             error "O URL do repositório não foi informado!"
                         }
                         sh "git config --global --add safe.directory ${CANDIDATE_WORKSPACE}"
-                        sh "git clone ${params.GIT_REPO_URL} ${CANDIDATE_WORKSPACE}"
+                        sh "git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/frederico101/DeveloperStore.git ${CANDIDATE_WORKSPACE}"
                         sh 'chown -R $(whoami):$(whoami) ${CANDIDATE_WORKSPACE}'
                         dir("${CANDIDATE_WORKSPACE}") {
                             sh 'git checkout main || git checkout master'
