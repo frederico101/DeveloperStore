@@ -53,7 +53,7 @@ pipeline {
                     mkdir -p /tests/results &&
                     cd /tests &&
                     dotnet restore &&
-                    dotnet test --logger 'trx;LogFileName=results.trx' --results-directory ./results
+                    dotnet test --logger 'trx;LogFileName=results.trx' --results-directory /tests/results
                     "
                     '''
                 }
