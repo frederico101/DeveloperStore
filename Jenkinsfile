@@ -9,7 +9,8 @@ pipeline {
         TESTS_PATH = "C:\\data\\tests-suite"
         GIT_USERNAME = 'frederico101'
         GIT_PASSWORD = credentials('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')
-    
+    }
+
     stages {
         stage('Clone Repository') {
             steps {
