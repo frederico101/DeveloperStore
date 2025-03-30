@@ -11,7 +11,7 @@ pipeline {
         TESTS_PATH = "/data/tests-suite"
         GIT_BRANCH = "feature/Configure-pipeline-master"
         // Use Jenkins credentials for GitHub authentication
-        GIT_CREDENTIALS_ID = 'github-credentials' // Replace with your Jenkins credential ID
+        GIT_CREDENTIALS_ID = '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' // Replace with your Jenkins credential ID
     }
 
     stages {
