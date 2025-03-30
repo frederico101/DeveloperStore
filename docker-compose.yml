@@ -69,4 +69,4 @@ networks:
     external: true
 volumes:
   jenkins_home:
-  
+  docker-storage:
