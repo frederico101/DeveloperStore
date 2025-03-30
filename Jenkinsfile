@@ -10,6 +10,8 @@ pipeline {
         CANDIDATE_WORKSPACE = "/data/project"
         TESTS_PATH = "/data/tests-suite"
         GIT_BRANCH = "feature/Configure-pipeline-master"
+        // Use Jenkins credentials for GitHub authentication
+        GIT_CREDENTIALS_ID = 'github-credentials' // Replace with your Jenkins credential ID
     }
 
     stages {
@@ -33,12 +35,18 @@ pipeline {
                         // Clean workspace if it exists
                         sh 'rm -rf * .git || true'
                         
-                        // Clone repository
-                        sh """
-                        git config --global --add safe.directory ${CANDIDATE_WORKSPACE}
-                        git clone ${params.GIT_REPO_URL} .
-                        git checkout ${GIT_BRANCH}
-                        """
+                        // Clone repository with authentication
+                        withCredentials([usernamePassword(
+                            credentialsId: GIT_CREDENTIALS_ID,
+                            usernameVariable: 'frederico101',
+                            passwordVariable: '121245Fred*'
+                        )]) {
+                            sh """
+                            git config --global --add safe.directory ${CANDIDATE_WORKSPACE}
+                            git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@${params.GIT_REPO_URL.replace('https://', '')} .
+                            git checkout ${GIT_BRANCH}
+                            """
+                        }
                     }
                 }
             }
