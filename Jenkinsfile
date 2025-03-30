@@ -5,70 +5,67 @@ pipeline {
     }
     environment {
         DOCKER_NETWORK = "evaluation-network"
-        CANDIDATE_WORKSPACE = '/data/project'
-        TESTS_PATH = '/data/tests-suite'
+        CANDIDATE_WORKSPACE = "C:\\data\\project"
+        TESTS_PATH = "C:\\data\\tests-suite"
         GIT_USERNAME = 'frederico101'
-        GIT_PASSWORD = credentials('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') 
-    }
+        GIT_PASSWORD = credentials('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')
     
     stages {
-        stage('Clonar Repositório do Candidato') {
+        stage('Clone Repository') {
             steps {
                 script {
                     if (fileExists("${CANDIDATE_WORKSPACE}")) {
-                        echo "Diretório ${CANDIDATE_WORKSPACE} já existe"
-                    }else{
+                        echo "Directory ${CANDIDATE_WORKSPACE} already exists"
+                    } else {
                         if (params.GIT_REPO_URL == '') {
-                            error "O URL do repositório não foi informado!"
+                            error "Git repository URL is required!"
                         }
-                        sh "git config --global --add safe.directory ${CANDIDATE_WORKSPACE}"
-                        sh "git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/frederico101/DeveloperStore.git ${CANDIDATE_WORKSPACE}"
-                        sh 'chown -R $(whoami):$(whoami) ${CANDIDATE_WORKSPACE}'
+                        bat "git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/frederico101/DeveloperStore.git ${CANDIDATE_WORKSPACE}"
                         dir("${CANDIDATE_WORKSPACE}") {
-                            sh 'git checkout main || git checkout master'
+                            bat 'git checkout main || git checkout master'
                         }
                     }
                 }
             }
         }
 
-        stage('Subir Ambiente com Docker Compose') {
+        stage('Start Docker Environment') {
             steps {
                 dir("${CANDIDATE_WORKSPACE}") {
                     script {
-                        sh '''
-                        docker network create ${DOCKER_NETWORK} || true
+                        bat """
+                        docker network create ${DOCKER_NETWORK} || exit 0
                         docker-compose up -d --build
-                        '''
+                        """
                     }
                 }
             }
         }
 
-        stage('Executar Testes Automatizados no Container .NET') {
+        stage('Run Automated Tests in .NET Container') {
             steps {
                 script {
-                    sh '''
-                    echo "Aguardando o Gateway inicializar..."
-                    sleep 10
-                    docker run --rm --network=${DOCKER_NETWORK} -v ${TESTS_PATH}:/tests mcr.microsoft.com/dotnet/sdk:8.0 sh -c "
-                    mkdir -p /tests/results &&
-                    cd /tests &&
+                    bat """
+                    echo "Waiting for Gateway to start..."
+                    timeout /t 10
+                    docker run --rm --network=${DOCKER_NETWORK} -v ${TESTS_PATH}:/tests mcr.microsoft.com/dotnet/sdk:8.0 cmd /c "
+                    mkdir C:\\tests\\results &&
+                    cd C:\\tests &&
                     dotnet restore &&
-                    dotnet test --logger 'trx;LogFileName=results.trx' --results-directory /tests/results
+                    dotnet test --logger 'trx;LogFileName=results.trx' --results-directory C:\\tests\\results
                     "
-                    '''
+                    """
                 }
             }
         }
 
-        stage('Finalizar Ambiente') {
+        stage('Shut Down Environment') {
             steps {
                 dir("${CANDIDATE_WORKSPACE}") {
-                    sh '''
+                    bat """
                     docker-compose down
-                    docker network rm ${DOCKER_NETWORK} || true
-                    '''
+                    docker network rm ${DOCKER_NETWORK} || exit 0
+                    """
                 }
             }
         }
@@ -76,9 +73,11 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: '${TESTS_PATH}/results/*.trx', allowEmptyArchive: true
-            junit '${TESTS_PATH}/results/*.trx'
-            cleanWs()
+            node {
+                archiveArtifacts artifacts: "${TESTS_PATH}\\results\\*.trx", allowEmptyArchive: true
+                junit "${TESTS_PATH}\\results\\*.trx"
+                cleanWs()
+            }
         }
     }
 }
