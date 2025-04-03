@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using SalesApi.Application.Commands;
+using SalesApi.Application.Queries;
 
 namespace SalesApi.Controllers
 {
@@ -39,8 +40,25 @@ namespace SalesApi.Controllers
         [HttpPost(Name = "sales")]
         public async Task<IActionResult> CreateSale([FromBody] CreateSaleCommand command)
         {
-            var saleId = await _mediator.Send(command);
-            return CreatedAtAction(nameof(CreateSale), new { id = saleId }, saleId);
+            var saleDto = await _mediator.Send(command);
+            return Ok(new
+            {
+                data = saleDto,
+                status = "success",
+                message = "Venda criada com sucesso"
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetSales()
+        {
+            var result = await _mediator.Send(new GetSalesQuery());
+            return Ok(new
+            {
+                data = result,
+                status = "success",
+                message = "Lista de vendas obtida com sucesso"
+            });
         }
     }
 }

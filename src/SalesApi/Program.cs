@@ -2,6 +2,7 @@ using MediatR;
 using SalesApi.Application.Handlers;
 using Microsoft.EntityFrameworkCore;
 using Structure;
+using SalesApi.Application.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,8 @@ builder.WebHost.UseUrls("http://+:8090");
 
 // Register MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateSaleCommandHandler).Assembly));
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // Configure Entity Framework with SQL Server
 builder.Services.AddDbContext<SalesDbContext>(options =>

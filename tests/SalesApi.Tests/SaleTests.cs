@@ -12,7 +12,7 @@ public class SaleTests
     {
          // Arrange
         var faker = new Faker<SaleItem>()
-            .CustomInstantiator(f => new SaleItem(Guid.NewGuid(), f.Commerce.ProductName(), quantity, 100, 0));
+            .CustomInstantiator(f => new SaleItem(Guid.NewGuid(), quantity, 100, 0));
         var items = faker.Generate(1);
 
         // Act
@@ -30,7 +30,7 @@ public class SaleTests
     {
         // Arrange
         var faker = new Faker<SaleItem>()
-            .CustomInstantiator(f => new SaleItem(Guid.NewGuid(), f.Commerce.ProductName(), quantity, 100, 0));
+            .CustomInstantiator(f => new SaleItem(Guid.NewGuid(), quantity, 100, 0));
 
         var items = faker.Generate(1);
 
@@ -46,7 +46,7 @@ public class SaleTests
     {
         // Arrange
         var faker = new Faker<SaleItem>()
-            .CustomInstantiator(f => new SaleItem(Guid.NewGuid(), f.Commerce.ProductName(), 21, 100, 0));
+            .CustomInstantiator(f => new SaleItem(Guid.NewGuid(), 21, 100, 0));
 
         var items = faker.Generate(1);
 
@@ -66,7 +66,7 @@ public class SaleTests
     {
         // Arrange
         var faker = new Faker<SaleItem>()
-            .CustomInstantiator(f => new SaleItem(Guid.NewGuid(), f.Commerce.ProductName(), quantity, 100, 0)); // $100 per item
+            .CustomInstantiator(f => new SaleItem(Guid.NewGuid(), quantity, 100, 0)); // $100 per item
 
         var items = faker.Generate(1);
 
