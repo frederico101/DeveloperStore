@@ -5,8 +5,9 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "sales-api",
-          "Port": 8090
+          //"Host": "sales-api",
+          "Host": "localhost",
+          "Port": 44377
         }
       ],
       "UpstreamPathTemplate": "/api/sales/{everything}",
