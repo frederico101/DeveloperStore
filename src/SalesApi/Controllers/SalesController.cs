@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using MediatR;
+using SalesApi.Application.Commands;
+using SalesApi.Application.Queries;
 
 namespace SalesApi.Controllers
 {
@@ -6,34 +9,38 @@ namespace SalesApi.Controllers
     [Route("api/[controller]")]
     public class SalesController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
+        private readonly IMediator _mediator;
         private readonly ILogger<SalesController> _logger;
 
-        public SalesController(ILogger<SalesController> logger)
+        public SalesController(ILogger<SalesController> logger, IMediator mediator)
         {
+            _mediator = mediator;
             _logger = logger;
         }
 
-        [HttpGet(Name = "GetSales")]
-        public IEnumerable<Sales> Get()
+
+        [HttpPost(Name = "sales")]
+        public async Task<IActionResult> CreateSale([FromBody] CreateSaleCommand command)
         {
-            return Enumerable.Range(1, 5).Select(index => new Sales
+            var saleDto = await _mediator.Send(command);
+            return Ok(new
             {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+                data = saleDto,
+                status = "success",
+                message = "Venda criada com sucesso"
+            });
         }
 
-        [HttpPost(Name = "Test")]
-        public string Test()
+        [HttpGet]
+        public async Task<IActionResult> GetSales()
         {
-            return "Haaaa";
+            var result = await _mediator.Send(new GetSalesQuery());
+            return Ok(new
+            {
+                data = result,
+                status = "success",
+                message = "Lista de vendas obtida com sucesso"
+            });
         }
     }
 }
