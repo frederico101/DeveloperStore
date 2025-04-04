@@ -20,11 +20,7 @@ public class CreateSaleCommandHandler : IRequestHandler<CreateSaleCommand, SaleD
     }
 
     public async Task<SaleDto> Handle(CreateSaleCommand request, CancellationToken cancellationToken)
-    {
-
-
-        //var sale = new Sale(request.SaleNumber, request.CustomerId, request.BranchId, request.Items);
-      
+    { 
 
 
         var saleItems = new List<SaleItem>();
