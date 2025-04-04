@@ -20,10 +20,7 @@ namespace Domain;
     }
     public Sale(string saleNumber, string customer, string branch, List<SaleItem> items)
     { 
-        if (items.Any(item => item.Quantity > 20))
-        {
-            throw new InvalidOperationException("It's not possible to sell more than 20 identical items.");
-        }
+     
         SaleId = Guid.NewGuid();
         SaleNumber = saleNumber;
         SaleDate = DateTime.UtcNow;
