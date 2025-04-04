@@ -45,7 +45,7 @@ namespace Structure
             {
                 entity.HasKey(p => p.Id); // Use a unique identifier for each product
                 entity.Property(p => p.Id).ValueGeneratedOnAdd(); // Auto-generate ID
-                entity.Property(p => p.Title).IsRequired().HasMaxLength(100); // Product title
+                entity.Property(p => p.Title).HasMaxLength(100); // Product title
                 entity.Property(p => p.Price).IsRequired().HasColumnType("decimal(18,2)"); // Product price
                 entity.Property(p => p.Description).HasMaxLength(500); // Optional description
                 entity.Property(p => p.Category).HasMaxLength(100); // Optional category

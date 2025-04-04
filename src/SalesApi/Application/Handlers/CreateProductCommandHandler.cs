@@ -20,6 +20,8 @@ namespace SalesApi.Application.Handlers
 
         public async Task<ProductDto> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
+            var title = request.Title == "" ? "Default Title" : request.Title;
+
             // Map the incoming command to the Product entity
             var product = _mapper.Map<Product>(request);
 
