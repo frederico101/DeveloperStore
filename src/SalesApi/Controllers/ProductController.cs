@@ -16,7 +16,7 @@ namespace SalesApi.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost]
+        [HttpPost(Name = "create-product")]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProductCommand command)
         {
             var result = await _mediator.Send(command);
@@ -28,7 +28,7 @@ namespace SalesApi.Controllers
             });
         }
 
-        [HttpGet]
+        [HttpGet(Name = "get-products")]
         public async Task<IActionResult> GetProducts()
         {
             var result = await _mediator.Send(new GetProductsQuery());
