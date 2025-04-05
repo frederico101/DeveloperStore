@@ -5,23 +5,23 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7777
+          "Host": "sales-api",
+          "Port": 8090
         }
       ],
       "UpstreamPathTemplate": "/api/sales/{everything}",
       "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete" ]
     },
     {
-      "DownstreamPathTemplate": "/api/products/{everything}",
+      "DownstreamPathTemplate": "/api/product/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "sales-api",
-          "Port": 7777
+          "Port": 8090
         }
       ],
-      "UpstreamPathTemplate": "/api/products/{everything}",
+      "UpstreamPathTemplate": "/api/product/{everything}",
       "UpstreamHttpMethod": [ "Get", "Post" ]
     }
   ],
