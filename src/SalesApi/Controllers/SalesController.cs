@@ -24,22 +24,22 @@ namespace SalesApi.Controllers
         public async Task<IActionResult> CreateSale([FromBody] CreateSaleCommand command)
         {
             SaleDto saleDto = await _mediator.Send(command);
-            //List<SaleItemDto> result = saleDto.Items.Where(x => x.Quantity > 20).ToList();
-            // var test = result.Where(a => a.Quantity > 20);   
-            //if (test.Any( a => a.Quantity > 20))
+            List<SaleItemDto> result = saleDto.Items.Where(x => x.Quantity > 20).ToList();
+            var test = result.Where(a => a.Quantity > 20);   
+            if (test.Any( a => a.Quantity > 20))
 
-            //        return BadRequest(new
-            //        {
-            //        Type = "BadRequest",
-            //        Error = "Invalid Sell",
-            //        Detail = "You cannot buy more than 20 pieces of the same item"
-            //        });
+                   return BadRequest(new
+                   {
+                   Type = "BadRequest",
+                   Error = "Invalid Sell",
+                   Detail = "You cannot buy more than 20 pieces of the same item"
+                   });
 
             return Ok(new
             {
                 data = saleDto,
                 status = "success",
-                message = "Venda criada com sucesso"
+                message = "Sale created successfully"
             });
         }
 
@@ -51,7 +51,7 @@ namespace SalesApi.Controllers
             {
                 data = result,
                 status = "success",
-                message = "Lista de vendas obtida com sucesso"
+                message = "List of sales obtained successfully"
             });
         }
 
@@ -66,7 +66,7 @@ namespace SalesApi.Controllers
                 return Ok(new
                 {
                     status = "success",
-                    message = "Venda cancelada com sucesso"
+                    message = "sale canceled with success"
                 });
             }
             catch (Exception ex)
