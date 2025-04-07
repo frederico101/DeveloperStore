@@ -6,11 +6,11 @@ namespace SalesApi.Tests;
 public class SaleTests
 {
     [Theory]
-   // [InlineData(4, 360)]  // 10% discount for 4 items
+    // [InlineData(4, 360)]  // 10% discount for 4 items
     [InlineData(5, 450)] // 10% discount for 5 items
     public void Should_Apply_10Percent_Discount_For_5_Or_More_Identical_Items(int quantity, decimal expectedTotalAmount)
     {
-         // Arrange
+        // Arrange
         var faker = new Faker<SaleItem>()
             .CustomInstantiator(f => new SaleItem(Guid.NewGuid(), quantity, 100, 0));
         var items = faker.Generate(1);

@@ -16,6 +16,9 @@ builder.WebHost.UseUrls("http://+:8090");
 
 // Register MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateSaleCommandHandler).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetProductsQueryHandler).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetSalersQueryHandler).Assembly));
+
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
