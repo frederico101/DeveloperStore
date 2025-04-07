@@ -12,7 +12,7 @@ using Structure;
 namespace SalesApi.Infrastructure.Migrations
 {
     [DbContext(typeof(SalesDbContext))]
-    [Migration("20250403020051_CreateSalesProductEndsalesItemTables")]
+    [Migration("20250407155910_CreateSalesProductEndsalesItemTables")]
     partial class CreateSalesProductEndsalesItemTables
     {
         /// <inheritdoc />

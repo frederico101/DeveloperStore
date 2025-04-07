@@ -2,20 +2,19 @@
 using Domain;
 using SalesApi.Application.DTOs;
 
-namespace SalesApi.Application.Mappings
+public class MappingProfile : Profile
 {
-    public class MappingProfile : Profile
+    public MappingProfile()
     {
-        public MappingProfile()
-        {
-            CreateMap<Sale, SaleDto>()
-                .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.Items.Sum(i => i.Quantity * i.UnitPrice - i.Discount)))
-                .ForMember(dest => dest.Date, opt => opt.MapFrom(src => DateTime.UtcNow))
-                .ReverseMap();
+        CreateMap<Sale, SaleDto>()
+        .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.SaleId))
+        .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.SaleDate))
+        .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Customer))
+        .ForMember(dest => dest.Branch, opt => opt.MapFrom(src => src.Branch))
+        .ForMember(dest => dest.Cancelled, opt => opt.MapFrom(src => src.IsCancelled));
 
-            CreateMap<SaleItem, SaleItemDto>()
-                .ForMember(dest => dest.Total, opt => opt.MapFrom(src => src.Quantity * src.UnitPrice - src.Discount))
-                .ReverseMap();
-        }
+        CreateMap<SaleItem, SaleItemDto>()
+            .ForMember(dest => dest.Total, opt => opt.MapFrom(src => src.TotalAmount))
+            .ForMember(dest => dest.IsCancelled, opt => opt.MapFrom(src => false));
     }
 }

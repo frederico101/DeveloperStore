@@ -21,6 +21,7 @@ namespace SalesApi.Application.Handlers
                 throw new KeyNotFoundException("Sale not found");
             }
 
+            sale.Cancel();
             await _context.SaveChangesAsync(cancellationToken);
 
             return Unit.Value;
